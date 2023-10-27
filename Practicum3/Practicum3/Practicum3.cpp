@@ -278,13 +278,13 @@ int main()
 //	std::cin >> n;
 //
 //
-//	//rows
+//	rows
 //	for (int i = 1; i <= 2 * n - 1; i++)
 //	{
 //
-//		//cols
+//		cols
 //
-//		//first third
+//		first third
 //
 //		for (int k = 1; k <= n; k++)
 //		{
@@ -302,7 +302,7 @@ int main()
 //			}
 //		}
 //
-//		//second third
+//		second third
 //		for (int k = 1; k <= n; k++)
 //		{
 //			if (i == n)
@@ -317,7 +317,7 @@ int main()
 //		std::cout << " ";
 //
 //
-//		//last third
+//		last third
 //		for (int k = n; k >= 1; k--)
 //		{
 //			if (k <= i && i <= n)
@@ -341,6 +341,67 @@ int main()
 
 	int n;
 	std::cin >> n;
+
+	/*for (int i = 1; i <= n + 2; i++)
+	{
+		std::cout << "#";
+	}
+	std::cout << std::endl;
+
+
+	for (int k = 0; k < n; k++)
+	{
+
+		for (int i = 0; i <= n + 1; i++)
+		{
+			if (i == 0 || i == n + 1)
+			{
+				std::cout << "#";
+			}
+			else
+			{
+				int toPrint = (i + k) % n;
+				std::cout << (toPrint == 0 ? n : toPrint);
+			}
+
+		}
+
+		std::cout << std::endl;
+
+	}
+	for (int i = 0; i < n + 2; i++)
+	{
+		std::cout << "#";
+	}
+	std::cout << std::endl;
+
+	for (int k = n; k > 0; k--)
+	{
+
+		for (int i = n + 2; i >= 1; i--)
+		{
+			if (i == 1 || i == n + 2)
+			{
+				std::cout << "#";
+			}
+			else
+			{
+				int toPrint = (i + k) % n;
+				std::cout << (toPrint == 0 ? n : toPrint);
+			}
+
+		}
+
+		std::cout << std::endl;
+	}
+
+
+
+
+	for (int i = 1; i <= n + 2; i++)
+	{
+		std::cout << "#";
+	}*/
 
 	for (int i = 1; i <= 2 * n + 3; i++)
 	{
@@ -377,16 +438,16 @@ int main()
 					}
 					else
 					{
-						int toPrint = 0;
+						int toprint = 0;
 
-						toPrint = ((i-3 + k) % n);
+						toprint = ((i-3 + k) % n);
 
 
-						if (toPrint == 0)
+						if (toprint == 0)
 						{
-							toPrint = n;
+							toprint = n;
 						}
-						std::cout << toPrint;;
+						std::cout << toprint;;
 					}
 				}
 			}
@@ -402,15 +463,15 @@ int main()
 					}
 					else
 					{
-						int toPrint = 0;
+						int toprint = 0;
 
-						toPrint = (i + k+1)%n;
+						toprint = ((n-i) + k) % n;
 
-						if (toPrint == 0)
+						if (toprint == 0)
 						{
-							toPrint = n;
+							toprint = n;
 						}
-						std::cout << toPrint;;
+						std::cout << toprint;;
 					}
 				}
 			}
@@ -419,29 +480,29 @@ int main()
 		std::cout << std::endl;
 	}
 
-	//14
+	/*14
 
-		//int n;
-		//std::cin >> n;
+		int n;
+		std::cin >> n;
 
-		//for (int i = 1; i <= n; i++)
-		//{
-		//	for (int k = 1; k <= n; k++)
-		//	{
+		for (int i = 1; i <= n; i++)
+		{
+			for (int k = 1; k <= n; k++)
+			{
 
-		//		int elementBefore = k * n;
+				int elementBefore = k * n;
 
-		//		if (k % 2 == 0)
-		//		{
-		//			elementBefore += n - i;
-		//		}
-		//		else
-		//		{
-		//			elementBefore += i - 1;
-		//		}
+				if (k % 2 == 0)
+				{
+					elementBefore += n - i;
+				}
+				else
+				{
+					elementBefore += i - 1;
+				}
 
-		//		std::cout << elementBefore + 1 - n << " ";
-		//	}
-		//	std::cout << std::endl;
-		//}
+				std::cout << elementBefore + 1 - n << " ";
+			}
+			std::cout << std::endl;
+		}*/
 }
