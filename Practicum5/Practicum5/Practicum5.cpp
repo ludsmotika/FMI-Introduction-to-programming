@@ -164,15 +164,15 @@ void devideByIndexes(int& fromEvenIndexes, int& fromOddIndexes, int a)
 		}
 	}
 
-	if (countOfEndingZeros>0)
+	if (countOfEndingZeros > 0)
 	{
 		for (int i = countOfDigitsOfA - countOfEndingZeros; i < countOfDigitsOfA; i++)
 		{
-			if (i%2==0) 
+			if (i % 2 == 0)
 			{
 				fromEvenIndexes *= 10;
 			}
-			else 
+			else
 			{
 				fromOddIndexes *= 10;
 			}
@@ -184,16 +184,17 @@ void devideByIndexes(int& fromEvenIndexes, int& fromOddIndexes, int a)
 int countOfSimpleDevisors(int num)
 {
 	int simpleDevisors = 0;
-	for (int i = 2; i <= num/2; i++)
+	int copy = num;
+	for (int i = 2; i <= copy / 2; i++)
 	{
-		if (num%i==0) 
+		if (num % i == 0)
 		{
 			simpleDevisors++;
+			num = num / i;
 			i--;
-			num = num/ i;
 		}
 	}
-	if (simpleDevisors==0)
+	if (simpleDevisors == 0)
 	{
 		return 1;
 	}
@@ -201,7 +202,7 @@ int countOfSimpleDevisors(int num)
 	return simpleDevisors;
 }
 
-void changeValuesWithNumsInIntervals(int& a,int& b, int k)
+void changeValuesWithNumsInIntervals(int& a, int& b, int k)
 {
 
 	for (int i = a; i <= b; i++)
@@ -213,7 +214,7 @@ void changeValuesWithNumsInIntervals(int& a,int& b, int k)
 			break;
 		}
 	}
-	
+
 	for (int i = b; i >= a; i--)
 	{
 		int current = countOfSimpleDevisors(i);
@@ -226,6 +227,47 @@ void changeValuesWithNumsInIntervals(int& a,int& b, int k)
 	}
 }
 
+//07
+
+void swapDigitsFromFirstToSecondNumber(int& first, int& second, int amount)
+{
+	int countOfDigitsOfSecond = countOfDigits(second);
+
+	for (int i = 0; i < amount; i++)
+	{
+		int current = first % 10;
+		first /= 10;
+		second = second + power(10, countOfDigitsOfSecond - 1) * current;
+		countOfDigitsOfSecond++;
+	}
+}
+
+//08
+
+int getPartFromNumber(int num, int start, int stop)
+{
+	int countOfDigitsOfNum = countOfDigits(num);
+
+	//remove the last numbers
+	for (int i = 0; i < countOfDigitsOfNum - stop; i++)
+	{
+		num /= 10;
+	}
+
+	int answer = 0;
+	int multiplier = 1;
+
+	for (int i = 0; i <= stop-start; i++)
+	{
+		int current = num % 10;
+		answer += current * multiplier;
+		multiplier *= 10;
+		num /= 10;
+	}
+
+	return answer;
+}
+
 int main()
 {
 	int a;
@@ -233,9 +275,9 @@ int main()
 	int k;
 	std::cin >> a >> b >> k;
 
-	changeValuesWithNumsInIntervals(a, b, k);
+	a = getPartFromNumber(a, b, k);
 
-	std::cout << a << " " << b;
+	std::cout << a;
 
 	//19 32 3
 }
