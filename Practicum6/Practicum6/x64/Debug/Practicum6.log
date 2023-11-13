@@ -1,0 +1,4 @@
+﻿  Practicum6.cpp
+C:\Users\danie\source\repos\FMI-Introduction-to-programming\Practicum6\Practicum6\Practicum6.cpp(7,24): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+C:\Users\danie\source\repos\FMI-Introduction-to-programming\Practicum6\Practicum6\Practicum6.cpp(14,27): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+  Practicum6.vcxproj -> C:\Users\danie\source\repos\FMI-Introduction-to-programming\Practicum6\x64\Debug\Practicum6.exe
