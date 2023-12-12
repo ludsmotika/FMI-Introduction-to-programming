@@ -1,0 +1,3 @@
+﻿  practicum9.cpp
+C:\Users\danie\source\repos\FMI-Introduction-to-programming\practicum9\practicum9\practicum9.cpp(55,15): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  practicum9.vcxproj -> C:\Users\danie\source\repos\FMI-Introduction-to-programming\practicum9\x64\Debug\practicum9.exe

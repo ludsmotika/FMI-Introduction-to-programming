@@ -1,0 +1,5 @@
+﻿  practicum10.cpp
+C:\Users\danie\source\repos\FMI-Introduction-to-programming\practicum10\practicum10\practicum10.cpp(53,21): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\danie\source\repos\FMI-Introduction-to-programming\practicum10\practicum10\practicum10.cpp(99,42): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\danie\source\repos\FMI-Introduction-to-programming\practicum10\practicum10\practicum10.cpp(110,16): warning C4267: '=': conversion from 'size_t' to 'char', possible loss of data
+  practicum10.vcxproj -> C:\Users\danie\source\repos\FMI-Introduction-to-programming\practicum10\x64\Debug\practicum10.exe
