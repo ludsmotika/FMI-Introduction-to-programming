@@ -67,7 +67,7 @@ void createString(const char* source, char* result)
 
 //03
 
-void fillCountOfOccurrences(char* sourceptr, int* arr,int isEqualTo)
+void fillCountOfOccurrences(char* sourceptr, int* arr, int isEqualTo)
 {
 	int counter = 0;
 	while (*sourceptr != '\0')
@@ -122,31 +122,28 @@ void createStringFromStringOfNumbers(char* sourceptr, char* result)
 
 void shiftAllToTheLeft(char* source)
 {
-	if(!source)
+	if (!source)
 	{
 		return;
 	}
 
-	while (source != "\0")
+	while (*source != '\0')
 	{
-		source++;
-		char current = *source;
-		source--;
-		*source = current;
+		*source = source[1];
 		source++;
 	}
 }
 
-void removeSymbolFromIndex(char* source, char symbolToRemove) 
+void removeSymbolFromIndex(char* source, char symbolToRemove)
 {
-	if (!source) 
+	if (!source)
 	{
 		return;
 	}
 
-	while (*source!='\0')
+	while (*source != '\0')
 	{
-		if (*source==symbolToRemove) 
+		if (*source == symbolToRemove)
 		{
 			shiftAllToTheLeft(source);
 			source--;
@@ -157,14 +154,106 @@ void removeSymbolFromIndex(char* source, char symbolToRemove)
 
 }
 
+//05
+
+void checkForCurrentInSecond(const char* text, char symbol, bool* isCurrentInBoth, int* counter)
+{
+	while (*text != '\0')
+	{
+		if (*text == symbol)
+		{
+			*isCurrentInBoth = true;
+			break;
+		}
+
+		counter++;
+		text++;
+	}
+}
+
+int getSymbolsAndCountWhichAreInFirstAndNotInSecond(const char* text1, const char* text2, char* result)
+{
+	int countOfDiffSymbols = 0;
+
+	while (*text1 != '\0')
+	{
+		int counter = 0;
+
+		bool isCurrentInBoth = false;
+
+		checkForCurrentInSecond(text2, *text1, &isCurrentInBoth, &counter);
+
+		if (!isCurrentInBoth)
+		{
+			*result = *text1;
+			countOfDiffSymbols++;
+			result++;
+		}
+
+		text2 -= counter;
+		text1++;
+	}
+
+	return countOfDiffSymbols;
+}
+
+
+void differentSymbolsInTwoStrings(const char* text1, const char* text2, char* result)
+{
+	if (!text1 || !text2)
+	{
+		return;
+	}
+
+	result += getSymbolsAndCountWhichAreInFirstAndNotInSecond(text1, text2, result);
+
+	text1 -= strlen(text1);
+
+	result += getSymbolsAndCountWhichAreInFirstAndNotInSecond(text2, text1, result);
+
+	*result = '\0';
+}
+
+//06
+
+void toUpperOnWords(char* ptr)
+{
+	if (!ptr)
+	{
+		return;
+	}
+
+	if (*ptr >= 'a' && *ptr <= 'z')
+	{
+		*ptr = *ptr - ('a' - 'A');
+		ptr++;
+	}
+
+	bool doesNextForToUpper = false;
+
+	while (*ptr != '\0')
+	{
+		if (*ptr == ' ')
+		{
+			doesNextForToUpper = true;
+		}
+
+		if (*ptr >= 'a' && *ptr <= 'z' && doesNextForToUpper)
+		{
+			*ptr = *ptr - ('a' - 'A');
+			doesNextForToUpper = false;
+		}
+
+		ptr++;
+	}
+}
+
 int main()
 {
-	char text[maxLength] = "Hello, my friend!";
+	char text[maxLength] = "hello,  my friend!";
 	char* textptr = text;
-	//char result[maxLength];
-	//char* resultptr = result;
 
-	removeSymbolFromIndex(textptr, 'e');
+	toUpperOnWords(textptr);
 
 	std::cout << text;
 }
