@@ -1,0 +1,7 @@
+﻿  practicum11.cpp
+C:\Users\danie\source\repos\FMI-Introduction-to-programming\practicum11\practicum11\practicum11.cpp(65,13): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\danie\source\repos\FMI-Introduction-to-programming\practicum11\practicum11\practicum11.cpp(114,43): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\danie\source\repos\FMI-Introduction-to-programming\practicum11\practicum11\practicum11.cpp(136,43): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\danie\source\repos\FMI-Introduction-to-programming\practicum11\practicum11\practicum11.cpp(262,41): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\danie\source\repos\FMI-Introduction-to-programming\practicum11\practicum11\practicum11.cpp(272,41): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+  practicum11.vcxproj -> C:\Users\danie\source\repos\FMI-Introduction-to-programming\practicum11\x64\Debug\practicum11.exe

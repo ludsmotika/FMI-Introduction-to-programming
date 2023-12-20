@@ -309,12 +309,12 @@ void rotateMatrixToTheRight(int matrix[][N], int answer[][N], size_t n)
 	{
 		for (size_t j = 0; j < n; j++)
 		{
-			answer[i][n-1-j] = matrix[j][i];
+			answer[i][n - 1 - j] = matrix[j][i];
 		}
 	}
 }
-
 int main()
 {
 }
+
 
