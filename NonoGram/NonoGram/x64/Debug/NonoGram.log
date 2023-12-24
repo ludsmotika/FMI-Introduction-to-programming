@@ -1,0 +1,3 @@
+﻿  NonoGram.cpp
+C:\Users\danie\source\repos\FMI-Introduction-to-programming\NonoGram\NonoGram\NonoGram.cpp(143,22): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+  NonoGram.vcxproj -> C:\Users\danie\source\repos\FMI-Introduction-to-programming\NonoGram\x64\Debug\NonoGram.exe
