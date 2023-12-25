@@ -126,10 +126,66 @@ void fillRowsFromFileToCharArray(char* filename, char** accounts, int rowsCount)
 	filein.close();
 }
 
-bool isRegisterInputValid(char** accounts, int rows, char* username, char* password)
+void saveUsernameAndPasswordInFile(char* filename, char* username, char* password) 
 {
+	std::ofstream ofs(filename, std::ofstream::app);
+
+	if (!ofs.is_open())
+	{
+		return;
+	}
+
+	ofs << username<< std::endl;
+	ofs << password<< std::endl;
+
+	ofs.clear();
+	ofs.close();
+}
+
+bool isValidInputForLogin(int indexOfUsername,char* password, char* passwordToCompareWith) 
+{
+	if (indexOfUsername == -1)
+	{
+		std::cout << "Invalid username!" << std::endl;
+		return false;
+	}
 	
-	//check if there is a user with the same username
+	if (mystrcmp(password, passwordToCompareWith))
+	{
+		std::cout << "Invalid password!" << std::endl;
+		return false;
+	}
+
+	return true;
+}
+
+bool isValidInputForRegister(int indexOfUsername, char* username, char* password) 
+{
+	if (indexOfUsername != -1)
+	{
+		std::cout << "This username is already in use!" << std::endl;
+		return false;
+	}
+
+	if (mystrlen(username) < 5)
+	{
+		std::cout << "Please enter a username which is at least 5 characters long!" << std::endl;
+		return false;
+	}
+
+	if (mystrlen(password) < 8)
+	{
+		std::cout << "Please enter a password which is at least 8 characters long!" << std::endl;
+		return false;
+	}
+
+	return true;
+}
+
+
+bool isInputValid(char** accounts, int rows, char* username, char* password, bool doesUserHaveAnAccount)
+{
+	//in order for the input to be valid the username must be in the accounts and the next element by index next to the username must be the password 
 
 	int indexOfUsername = -1;
 	for (size_t i = 0; i < rows; i += 2)
@@ -141,53 +197,25 @@ bool isRegisterInputValid(char** accounts, int rows, char* username, char* passw
 		}
 	}
 
-	if (indexOfUsername != -1)
+	if (doesUserHaveAnAccount)
 	{
-		std::cout << "This username is already in use!" << std::endl;
-		return false;
+		return isValidInputForLogin(indexOfUsername,password, accounts[indexOfUsername + 1]);
 	}
-	
-	//check how strong the password is
-
+	else 
+	{
+		return isValidInputForRegister(indexOfUsername,username,password);
+	}
 }
 
-bool isLoginInputValid(char** accounts, int rows, char* username, char* password)
+void userInput(char** accounts, int accountsFileRows, char* loggedInUsername, bool doesUserHaveAnAccount)
 {
-	//in order for the input to be valid the username must be in the accounts and the next element by index next to the username must be the password 
+	std::cout << (doesUserHaveAnAccount ? "Login" :"Register") << std::endl;
 
-	int indexOfUsername = -1;
-	for (size_t i = 0; i < rows; i += 2)
-	{
-		if (!mystrcmp(username,accounts[i]))
-		{
-			indexOfUsername = i;
-			break;
-		}
-	}
-
-	if (indexOfUsername == -1)
-	{
-		std::cout << "Invalid username!"<< std::endl;
-		return false;
-	}
-
-	if (mystrcmp(password,accounts[indexOfUsername+1]))
-	{
-		std::cout << "Invalid password!" << std::endl;
-		return false;
-	}
-
-	return true;
-}
-
-void userLogin(char** accounts, int accountsFileRows, char* loggedInUsername)
-{
 	//get the input of the user
 	std::cout << "Username: ";
 	char username[MaxAccountNameLength];
 
-	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-
+	std::cin.ignore();
 	std::cin.getline(username, MaxAccountNameLength);
 
 	std::cout << "Password: ";
@@ -196,49 +224,28 @@ void userLogin(char** accounts, int accountsFileRows, char* loggedInUsername)
 
 	//check if the input contains in the accounts
 
-	while (!isLoginInputValid(accounts, accountsFileRows, username, password))
+	while (!isInputValid(accounts, accountsFileRows, username, password,doesUserHaveAnAccount))
 	{
 		std::cout << "Username: ";
 		std::cin.getline(username, MaxAccountNameLength);
 
 		std::cout << "Password: ";
 		std::cin.getline(password, MaxAccountPasswordLength);
+	}
+
+	if (!doesUserHaveAnAccount)
+	{
+	  //save the new account username and password
+		char filename[] = "accounts.txt";
+		saveUsernameAndPasswordInFile(filename, username,password);
 	}
 
 	mystrcpy(username, loggedInUsername);
 }
 
 
-void userRegister(char** accounts,int accountsFileRows, char* loggedInUsername)
-{
-	//get the input
-	std::cout << "Username: ";
-	char username[MaxAccountNameLength];
 
-	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-
-	std::cin.getline(username, MaxAccountNameLength);
-
-	std::cout << "Password: ";
-	char password[MaxAccountPasswordLength];
-	std::cin.getline(password, MaxAccountPasswordLength);
-
-	while (!isRegisterInputValid(accounts, accountsFileRows, username, password))
-	{
-		std::cout << "Username: ";
-		std::cin.getline(username, MaxAccountNameLength);
-
-		std::cout << "Password: ";
-		std::cin.getline(password, MaxAccountPasswordLength);
-	}
-
-//add a row to the file with accounts
-
-
-}
-
-
-void setup(char* username)
+bool setup(char* username)
 {
 	printNonogramTitle();
 
@@ -256,38 +263,45 @@ void setup(char* username)
 	char doesUserHaveAnAccount = (answer == 'Y' || answer == 'y') ? true : false;
 
 	//load all accounts from the file
-	std::ifstream ifs("accounts.txt");
-
-	if (!ifs.is_open())
-	{
-		return;
-	}
-
 	char filename[] = "accounts.txt";
 	int accountsFileRows = fileRowsCount(filename);
 	char** accounts = new char* [accountsFileRows];
 
 	fillRowsFromFileToCharArray(filename, accounts, accountsFileRows);
 
-	if (doesUserHaveAnAccount)
-	{
-		userLogin(accounts, accountsFileRows, username);
-	}
-	else
-	{
-		userRegister(accounts, accountsFileRows,username);
-	}
+	userInput(accounts, accountsFileRows, username, doesUserHaveAnAccount);
+
+	return doesUserHaveAnAccount;
+}
+
+void checkForSavedGameOfUser(char* username, int& level, int& boardForLevel) 
+{
+	//open the file
+	//search for the name
+	//if the name exists find the level and the board 
+	//load the last played game data
 }
 
 int main()
 {
+	//setting up the game
+	char username[MaxAccountNameLength];
+	bool doesCurrentUserAlreadyHaveAnAccount = setup(username);
 
-	char currentuser[50];
-	setup(currentuser);
+	//see if the user have a saved game in the file with saved games
+	int level = -1;
+	int boardForLevel = -1;
 
-	//methods for reading from the files 
-	//methods for writing in the files
-	//MethodsFor Writing on the console
+	if (doesCurrentUserAlreadyHaveAnAccount)
+	{
+		checkForSavedGameOfUser(username, level, boardForLevel);
+	}
+
+    //the file must contain
+	//username
+	//level 
+	//currentState
+
 	//printing the currentState of the game
 
 }

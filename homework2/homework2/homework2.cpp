@@ -109,7 +109,7 @@ char* encodeText(const char* ptr)
 
 int main()
 {
-	char arr[] = "zzz";
+	char arr[] = "abc";
 	char* ptr = arr;
 
 	char* result = encodeText(ptr);
