@@ -630,17 +630,27 @@ void printWholeBoard(int** rowsInfo, int longestRowLength, int** colsInfo, int l
 
 	for (size_t i = 0; i < boardSize; i++)
 	{
-		for (size_t j = 0; j < longestRowLength; j++)
+
+		int indent = 0;
+		for (int j = longestRowLength - 1; j >= 0; j--)
 		{
-			if (rowsInfo[i][j] >= 1 && rowsInfo[i][j] <= 9)
+			if (rowsInfo[i][j])
 			{
+				(rowsInfo[i][j] >= 10 && rowsInfo[i][j] <= 99 ? indent += 3 : indent += 2);
 				std::cout << rowsInfo[i][j] << " ";
 			}
-			else if (!rowsInfo[i][j])
+			else
 			{
+				indent += 2;
 				std::cout << "  ";
 			}
 		}
+
+		for (size_t i = indent; i < longestRowSymbols; i++)
+		{
+			std::cout << " ";
+		}
+
 		std::cout << "|";
 
 		for (size_t j = 0; j < boardSize; j++)
@@ -688,11 +698,9 @@ void getInput(int& x, int& y, bool& toFill, char** currentBoard, int boardSize)
 	std::cout << "Enter x:";
 	std::cin >> x;
 	x--;
-	std::cout << std::endl;
 	std::cout << "Enter y:";
 	std::cin >> y;
 	y--;
-	std::cout << std::endl;
 	std::cout << "Mark as (fill = '1') or (empty = '0'):";
 	std::cin >> toFill;
 
@@ -701,15 +709,77 @@ void getInput(int& x, int& y, bool& toFill, char** currentBoard, int boardSize)
 		std::cout << "Enter x:";
 		std::cin >> x;
 		x--;
-		std::cout << std::endl;
 		std::cout << "Enter y:";
 		std::cin >> y;
 		y--;
-		std::cout << std::endl;
 		std::cout << "Mark as (fill = '1') or (empty = '0'):";
 		std::cin >> toFill;
 
 	}
+}
+
+void autofillLineIfCurrentMoveFilledIt(int x, int y, char** currentBoard, char** answerBoard, int boardSize)
+{
+	if (!currentBoard)
+		return;
+
+	for (size_t i = 0; i < boardSize; i++)
+	{
+		if (!currentBoard[i])
+			return;
+	}
+
+	bool isColFinished = true;
+	bool isRowFinished = true;
+	for (size_t i = 0; i < boardSize; i++)
+	{
+		if (answerBoard[i][y] == '1' && currentBoard[i][y] != '1')
+			isColFinished = false;
+
+		if (answerBoard[x][i] == '1' && currentBoard[x][i] != '1')
+			isRowFinished = false;
+	}
+
+	if (isRowFinished)
+	{
+		for (size_t i = 0; i < boardSize; i++)
+		{
+			if (answerBoard[x][i] == '0')
+				currentBoard[x][i] = '2';
+		}
+	}
+	if (isColFinished)
+	{
+		for (size_t i = 0; i < boardSize; i++)
+		{
+			if (answerBoard[i][y] == '0')
+				currentBoard[i][y] = '2';
+		}
+	}
+
+}
+
+bool doesUserWonTheGame(char** answerBoard, char** currentBoard, int boardSize)
+{
+	if (!answerBoard || !currentBoard)
+		return false;
+
+	for (size_t i = 0; i < boardSize; i++)
+	{
+		if (!answerBoard[i] || !currentBoard[i])
+			return false;
+	}
+
+	for (size_t i = 0; i < boardSize; i++)
+	{
+		for (size_t j = 0; j < boardSize; j++)
+		{
+			if (answerBoard[i][j] == '1' && currentBoard[i][j] != '1')
+				return false;
+		}
+	}
+
+	return true;
 }
 
 char playNonogram(char** answerBoard, char** currentBoard, int boardSize, int level)
@@ -743,9 +813,14 @@ char playNonogram(char** answerBoard, char** currentBoard, int boardSize, int le
 		{
 			currentBoard[x][y] = (toFill ? '1' : '2');
 
-			//check to fill the row with empty spaces : autofill
+			autofillLineIfCurrentMoveFilledIt(x, y, currentBoard, answerBoard, boardSize);
 
-			//check if the user won the game: if the currentBoard== answerBoard
+			if (doesUserWonTheGame(answerBoard, currentBoard, boardSize))
+			{
+				printWholeBoard(rowsInfo, longestRowLength, colsInfo, longestColLength, currentBoard, boardSize);
+				std::cout << "You have successfully passed the level!";
+				return 'w';
+			}
 		}
 		else
 		{
