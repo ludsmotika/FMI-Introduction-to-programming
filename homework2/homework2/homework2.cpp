@@ -107,17 +107,17 @@ char* encodeText(const char* ptr)
 	return result;
 }
 
-int main()
-{
-	char arr[] = "abc";
-	char* ptr = arr;
-
-	char* result = encodeText(ptr);
-
-	std::cout << result;
-
-	delete[] result;
-}
+//int main()
+//{
+//	char arr[] = "abc";
+//	char* ptr = arr;
+//
+//	char* result = encodeText(ptr);
+//
+//	std::cout << result;
+//
+//	delete[] result;
+//}
 
 
 //

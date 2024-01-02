@@ -10,75 +10,74 @@ bool isNumber(char ch)
 	return (ch >= '0' && ch <= '9');
 }
 
-void checkTheCurrentSymbol(char patternSymbol, char textSymbol, bool& wasPreviousSymbolPercent, bool& isPrefix)
+bool checkIfTheCurrentSymbolIsValid(char patternSymbol, char textSymbol)
 {
-	if (patternSymbol == '@')
+	bool isValid = true;
+
+	if (patternSymbol == '@' && !isLetter(textSymbol))
 	{
-		if (!isLetter(textSymbol))
-		{
-			isPrefix = false;
-		}
+		isValid = false;
 	}
-	else if (patternSymbol == '%')
+	else if (patternSymbol == '%' && !isNumber(textSymbol))
 	{
-		wasPreviousSymbolPercent = true;
-		if (!isNumber(textSymbol))
-		{
-			isPrefix = false;
-		}
-	}
-	else if (patternSymbol != '*' && (textSymbol != patternSymbol))
-	{
-		isPrefix = false;
+		isValid = false;
 	}
 
+	if (patternSymbol != '*' && patternSymbol != '%' && patternSymbol != '@' && patternSymbol != textSymbol)
+	{
+		isValid = false;
+	}
+
+	return isValid;
 }
 
 
-bool isPatternPrefix(const char* text, const char* pattern)
+int prefixesCount(const char* text, const char* pattern, bool isNested)
 {
 	if (!text || !pattern)
 	{
-		return false;
+		return 0;
 	}
 
-	bool isPrefix = true;
-	bool wasPreviousSymbolPercent = false;
+	if (*text == '\0')
+	{
+		return 0;
+	}
+
+	int count = 0;
 
 	while (*text && *pattern)
 	{
-		char currentPatternSymbol = *pattern;
-		char currentTextSymbol = *text;
+		bool isCurrentSymbolValid = checkIfTheCurrentSymbolIsValid(*pattern, *text);
 
-		checkTheCurrentSymbol(currentPatternSymbol, currentTextSymbol, wasPreviousSymbolPercent, isPrefix);
-
-		if (!isPrefix && wasPreviousSymbolPercent && isNumber(currentTextSymbol))
-		{
-			isPrefix = true;
-			pattern--;
-		}
-		
-		if (currentPatternSymbol != '%')
-		{
-			wasPreviousSymbolPercent = false;
-		}
-
-		if (!isPrefix)
+		if (!isCurrentSymbolValid)
 		{
 			break;
+		}
+
+		if (*pattern == '%')
+		{
+			if (isNested)
+			{
+				count += prefixesCount(text + 1, pattern + 1, false);
+			}
+			else
+			{
+				count += prefixesCount(text + 1, pattern, true);
+			}
 		}
 
 		text++;
 		pattern++;
 	}
 
-	//if there are symbols still left in the pattern but not in the text
-	if ((*pattern) && !(*text))
+
+	if (!(*pattern) && count == 0)
 	{
-		return false;
+		count++;
 	}
 
-	return isPrefix;
+	return count;
 }
 
 int countOfMatchesOfPattern(const char* ptr, const char* pattern)
@@ -92,26 +91,35 @@ int countOfMatchesOfPattern(const char* ptr, const char* pattern)
 
 	while (*ptr)
 	{
-		if (isPatternPrefix(ptr, pattern))
-		{
-			count++;
-		}
+		int current = prefixesCount(ptr, pattern, false);
 
+		/*std::cout << ptr << std::endl;
+		std::cout << pattern << std::endl;
+
+		std::cout << current << std::endl;*/
+
+		count += current;
 		ptr++;
 	}
 
 	return count;
 }
 
-//int main()
-//{
-//	char arr[] = "te3t zdrte44q     t£3A     te44t  t33t";
-//	char* text = arr;
-//
-//	char patternText[] = "t*%@";
-//	char* pattern = patternText;
-//
-//	int result = countOfMatchesOfPattern(text, pattern);
-//
-//	std::cout << result;
-//}
+int main()
+{
+	char arr[] = "12345";
+
+	//char arr[] = "123";
+	char* text = arr;
+
+	char patternText[] = "%%";
+	//char patternText[] = "%%";
+
+	//valid are: 1234 2345 3456 4567 123 234 345 456 567 12 23 34 45 56 67
+
+	char* pattern = patternText;
+
+	int result = countOfMatchesOfPattern(text, pattern);
+
+	std::cout << result;
+}
