@@ -87,13 +87,20 @@ int mystrlen(char* ptr)
 	return count;
 }
 
-void deleteMatrix(char** matrix, int rows) {
+void deleteMatrix(char** matrix, int rows)
+{
 
 	for (int i = 0; i < rows; i++)
 	{
 		delete[] matrix[i];
 	}
 	delete[] matrix;
+}
+
+int generateRandomNumberBetweenOneAndTwo()
+{
+	std::srand(static_cast<unsigned>(std::time(nullptr)));
+	return (std::rand() % 2) + 1;
 }
 
 int fileRowsCount(char* filename)
@@ -337,7 +344,7 @@ bool setup(char* username)
 
 	userInput(accounts, accountsFileRows, username, doesUserHaveAnAccount);
 
-	//todo: fix deleting a matrix
+	//todo: delete the matrix
 	//deleteMatrix(accounts, accountsFileRows);
 
 	return doesUserHaveAnAccount;
@@ -701,8 +708,9 @@ void getInput(int& x, int& y, bool& toFill, char** currentBoard, int boardSize)
 	std::cout << "Enter y:";
 	std::cin >> y;
 	y--;
+	int numToCast;
 	std::cout << "Mark as (fill = '1') or (empty = '0'):";
-	std::cin >> toFill;
+	std::cin >> numToCast;
 
 	while (!areValidIndexes(x, y, currentBoard, boardSize))
 	{
@@ -713,9 +721,10 @@ void getInput(int& x, int& y, bool& toFill, char** currentBoard, int boardSize)
 		std::cin >> y;
 		y--;
 		std::cout << "Mark as (fill = '1') or (empty = '0'):";
-		std::cin >> toFill;
-
+		std::cin >> numToCast;
 	}
+
+	toFill = numToCast;
 }
 
 void autofillLineIfCurrentMoveFilledIt(int x, int y, char** currentBoard, char** answerBoard, int boardSize)
@@ -803,6 +812,7 @@ char playNonogram(char** answerBoard, char** currentBoard, int boardSize, int le
 	while (true)
 	{
 		printWholeBoard(rowsInfo, longestRowLength, colsInfo, longestColLength, currentBoard, boardSize);
+		std::cout << "You have only " << level - wrongAnswers << " lives left!" << std::endl;
 
 		int x = 0;
 		int y = 0;
@@ -824,27 +834,121 @@ char playNonogram(char** answerBoard, char** currentBoard, int boardSize, int le
 		}
 		else
 		{
-			wrongAnswers++;
+			std::cout << "You made a mistake. This position should not be " << (toFill ? "checked" : "empty") << "." << std::endl;
+			if (++wrongAnswers == level)
+			{
+				std::cout << "you lost the game";
+				return 'l';
+			}
 		}
-
-		if (wrongAnswers == level)
-		{
-			std::cout << "you lost the game";
-			return 'l';
-		}
-
 	}
+}
+
+void saveGame(int level, int boardForLevel, char* username, char** board, int boardSize)
+{
+	if (!board)
+		return;
+
+	for (size_t i = 0; i < boardSize; i++)
+	{
+		if (!board[i])
+			return;
+	}
+
+	char filename[] = "savedgames.txt";
+	//open the file
+
+	//see if the user does have a saved game
+		   //if yes delete the old one
+	//save the new game in the format
+
+
+	//save
+	//username
+	//level
+	//boardForLevel
+	//currentBoard
+}
+
+char getInputAfterGameEnded(char* message)
+{
+	char answer;
+	std::cout << message << " Yes='y' No='n': ";
+	std::cin >> answer;
+
+	while (answer != 'Y' && answer != 'N' && answer != 'y' && answer != 'n')
+	{
+		std::cout << "Invalid answer! Try again: ";
+		std::cin >> answer;
+	}
+
+	return answer;
+}
+
+bool handleAnswerAfterGameEnded(char answer, char**& currentBoard, int boardSize, int& level, int& boardForLevel, char* username, bool doesUserWon)
+{
+	if (answer == 'n' || answer == 'N')
+	{
+		currentBoard = initBoard(level);
+		saveGame(level, boardForLevel, username, currentBoard, boardSize);
+
+		return false;
+	}
+	else if (answer == 'y' || answer == 'Y')
+	{
+		if (doesUserWon)
+		{
+			level++;
+			boardForLevel = generateRandomNumberBetweenOneAndTwo();
+		}
+		currentBoard = initBoard(level);
+	}
+
+	return true;
+}
+
+bool handleGameAnswer(char gameAnswer, char**& currentBoard, int boardSize, int& level, int& boardForLevel, char* username)
+{
+
+	if (gameAnswer == 'w')
+	{
+		char message[] = "Do you want to continue to the next level?";
+		char answer = getInputAfterGameEnded(message);
+
+		if (!handleAnswerAfterGameEnded(answer, currentBoard, boardSize, level, boardForLevel, username, true))
+		{
+			return false;
+		}
+	}
+	else if (gameAnswer == 'l')
+	{
+		char message[] = "Try again?";
+		char answer = getInputAfterGameEnded(message);
+
+		if (!handleAnswerAfterGameEnded(answer, currentBoard, boardSize, level, boardForLevel, username, false))
+		{
+			return false;
+		}
+	}
+	else if (gameAnswer == 's')
+	{
+		saveGame(level, boardForLevel, username, currentBoard, boardSize);
+		return false;
+	}
+
+	return true;
 }
 
 int main()
 {
+
 	//setting up the game
 	char username[MaxAccountNameLength];
 	bool doesCurrentUserAlreadyHaveAnAccount = setup(username);
 
 	//see if the user have a saved game in the file with saved games
 	int level = 1;
-	int boardForLevel = 2;
+	int boardForLevel = generateRandomNumberBetweenOneAndTwo();
 	bool doesUserHaveASavedGame = false;
 	char** currentBoard = initBoard(level);
 	char** answerBoard;
@@ -853,8 +957,9 @@ int main()
 	if (doesCurrentUserAlreadyHaveAnAccount)
 	{
 		//currentBoard = checkForSavedGameOfUser(username, level, boardForLevel, doesUserHaveASavedGame);
-	}
 
+		//get the input from the user if he want to continue playing one of the levels he had played
+	}
 
 	while (true)
 	{
@@ -863,30 +968,20 @@ int main()
 
 		printCharMatrix(answerBoard, boardSize);
 		char gameAnswer = playNonogram(answerBoard, currentBoard, boardSize, level);
-
 		// w == won, l == lose, s == saveGame and exit
-		if (gameAnswer == 'w')
+
+		if (!handleGameAnswer(gameAnswer, currentBoard, boardSize, level, boardForLevel, username))
 		{
-			//ask to go on a next level
-		}
-		else if (gameAnswer == 'l')
-		{
-			//ask to play again on the same level
-		}
-		else if (gameAnswer == 's')
-		{
-			//saveGame(level, boardForLevel, username, currentBoard);
+			return 0;
 		}
 
-		if (level == 6 && boardForLevel == 2)
+		if (level == 6)
 		{
-			//won the game message and end program
+			std::cout << "You passed all the levels. Congratulations!!!";
+			return 0;
 		}
-
-		break;
 
 	}
-
 }
 
 //todo: check for memory leaks
