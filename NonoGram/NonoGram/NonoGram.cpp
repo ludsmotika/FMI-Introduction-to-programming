@@ -89,12 +89,38 @@ int mystrlen(char* ptr)
 
 void deleteMatrix(char** matrix, int rows)
 {
-
 	for (int i = 0; i < rows; i++)
 	{
 		delete[] matrix[i];
 	}
 	delete[] matrix;
+}
+
+int convertCharToDigit(char ch)
+{
+	if (ch >= '0' && ch <= '9')
+		return ch - '0';
+
+	return -1;
+}
+
+unsigned convertStrToUnsigned(const char* str)
+{
+	if (!str)
+		return 0;
+
+	unsigned result = 0;
+
+	while (*str)
+	{
+		int digit = convertCharToDigit(*str);
+		if (digit == -1)
+			return 0;
+		(result *= 10) += digit;
+		str++;
+	}
+
+	return result;
 }
 
 int generateRandomNumberBetweenOneAndTwo()
@@ -170,7 +196,7 @@ void fillRowsFromFileToCharArray(char* filename, char** accounts, int rowsCount)
 		filein.getline(currentRow, MaxRowInFileLength, '\n');
 		int currentRowLength = mystrlen(currentRow);
 
-		accounts[i] = new char[currentRowLength];
+		accounts[i] = new char[currentRowLength + 1];
 		mystrcpy(currentRow, accounts[i]);
 	}
 
@@ -344,30 +370,42 @@ bool setup(char* username)
 
 	userInput(accounts, accountsFileRows, username, doesUserHaveAnAccount);
 
-	//todo: delete the matrix
-	//deleteMatrix(accounts, accountsFileRows);
+	deleteMatrix(accounts, accountsFileRows);
 
 	return doesUserHaveAnAccount;
 }
 
 char** checkForSavedGameOfUser(char* username, int& level, int& boardForLevel, bool& doesUserHaveASavedGame)
 {
-	//open the file
-
 	char filename[] = "savedGames.txt";
 	int savedGamesFileRows = fileRowsCount(filename);
 	char** savedGames = new char* [savedGamesFileRows];
 
 	fillRowsFromFileToCharArray(filename, savedGames, savedGamesFileRows);
 
-	//todo: fix deleting a matrix
-	//deleteMatrix(savedGames, savedGamesFileRows);
+	for (size_t i = 0; i < savedGamesFileRows; i++)
+	{
+		if (mystrcmp(savedGames[i], "save") && mystrcmp(savedGames[i + 1], username))
+		{
+			level = convertStrToUnsigned(savedGames[i + 1]);
+			boardForLevel = convertStrToUnsigned(savedGames[i + 2]);
+			int boardSize = boardSizeForLevel(level);
 
-	//search for the name
-	//if the name exists find the level and the board 
-	//load the last played game data
+			char** board = new char* [boardSize];
 
-	return new char* [5];
+			for (size_t j = 0; j < boardSize; j++)
+			{
+				board[j] = new char[boardSize+1];
+				mystrcpy(savedGames[j + i + 3], board[j]);
+			}
+
+			deleteMatrix(savedGames, savedGamesFileRows);
+			return board;
+		}
+	}
+
+	deleteMatrix(savedGames, savedGamesFileRows);
+	return nullptr;
 }
 
 
@@ -844,6 +882,54 @@ char playNonogram(char** answerBoard, char** currentBoard, int boardSize, int le
 	}
 }
 
+void deleteRows(const char* filename, int startRow, int endRow) {
+
+	std::ifstream inputFile(filename);
+
+	if (!inputFile.is_open()) {
+		std::cout << "Error opening file: " << filename << std::endl;
+		return;
+	}
+
+	if (startRow <= 0 || endRow < startRow) {
+		std::cout << "Invalid startRow or endRow values." << std::endl;
+		inputFile.close();
+		return;
+	}
+
+	std::ofstream outputFile("temp.txt");
+
+	int currentRow = 1;
+	char line[MaxRowInFileLength];
+
+	while (inputFile.getline(line, sizeof(line)))
+	{
+		if (currentRow < startRow || currentRow > endRow)
+		{
+			outputFile << line << std::endl;
+		}
+		++currentRow;
+	}
+
+	inputFile.close();
+	outputFile.close();
+
+	if (std::remove(filename) != 0)
+	{
+		std::cout << "Error removing file: " << filename << std::endl;
+		return;
+	}
+
+	if (std::rename("temp.txt", filename) != 0)
+	{
+		std::cout << "Error renaming file." << std::endl;
+		return;
+	}
+
+}
+
+
+
 void saveGame(int level, int boardForLevel, char* username, char** board, int boardSize)
 {
 	if (!board)
@@ -855,19 +941,54 @@ void saveGame(int level, int boardForLevel, char* username, char** board, int bo
 			return;
 	}
 
-	char filename[] = "savedgames.txt";
-	//open the file
+	char filename[] = "savedGames.txt";
+	int savedGamesFileRows = fileRowsCount(filename);
+	char** savedGames = new char* [savedGamesFileRows];
 
-	//see if the user does have a saved game
-		   //if yes delete the old one
-	//save the new game in the format
+	fillRowsFromFileToCharArray(filename, savedGames, savedGamesFileRows);
+
+	bool doesUserHaveASavedGame = false;
+	int rowToStartDeleting = -1;
+	int rowToStopDeleting = -1;
+
+	for (size_t i = 0; i < savedGamesFileRows; i++)
+	{
+		if (mystrcmp(savedGames[i], "save") && mystrcmp(savedGames[i + 1], username))
+		{
+			rowToStartDeleting = i;
+			int levelForSavedGameToDelete = convertStrToUnsigned(savedGames[i + 2]);
+			int rowsOfSavedGame = boardSizeForLevel(levelForSavedGameToDelete);
+
+			rowToStopDeleting = rowToStartDeleting + 3 + rowsOfSavedGame;
+			break;
+		}
+	}
+
+	if (rowToStartDeleting != -1)
+	{
+		deleteRows(filename, rowToStartDeleting, rowToStopDeleting);
+	}
 
 
-	//save
-	//username
-	//level
-	//boardForLevel
-	//currentBoard
+	std::ofstream ofs(filename, std::ofstream::app);
+	if (!ofs.is_open())
+	{
+		return;
+	}
+
+	ofs << "save" << std::endl;
+	ofs << username << std::endl;
+	ofs << level << std::endl;
+	ofs << boardForLevel << std::endl;
+	for (size_t i = 0; i < boardSize; i++)
+	{
+		ofs << board[i] << std::endl;
+	}
+
+	ofs.clear();
+	ofs.close();
+
+	deleteMatrix(savedGames, savedGamesFileRows);
 }
 
 char getInputAfterGameEnded(char* message)
@@ -956,9 +1077,14 @@ int main()
 
 	if (doesCurrentUserAlreadyHaveAnAccount)
 	{
-		//currentBoard = checkForSavedGameOfUser(username, level, boardForLevel, doesUserHaveASavedGame);
+		currentBoard = checkForSavedGameOfUser(username, level, boardForLevel, doesUserHaveASavedGame);
 
+		if (!currentBoard)
+		{
 		//get the input from the user if he want to continue playing one of the levels he had played
+
+		}
+
 	}
 
 	while (true)
@@ -967,6 +1093,7 @@ int main()
 		int boardSize = boardSizeForLevel(level);
 
 		printCharMatrix(answerBoard, boardSize);
+		printCharMatrix(currentBoard, boardSize);
 		char gameAnswer = playNonogram(answerBoard, currentBoard, boardSize, level);
 		// w == won, l == lose, s == saveGame and exit
 
