@@ -825,6 +825,21 @@ bool doesUserWonTheGame(char** answerBoard, char** currentBoard, int boardSize)
 	return true;
 }
 
+char getYesOrNoInput(char* message)
+{
+	char answer;
+	std::cout << message << " Yes='y' No='n': ";
+	std::cin >> answer;
+
+	while (answer != 'Y' && answer != 'N' && answer != 'y' && answer != 'n')
+	{
+		std::cout << "Invalid answer! Try again: ";
+		std::cin >> answer;
+	}
+
+	return answer;
+}
+
 char playNonogram(char** answerBoard, char** currentBoard, int boardSize, int level)
 {
 	if (!answerBoard || !currentBoard)
@@ -848,6 +863,12 @@ char playNonogram(char** answerBoard, char** currentBoard, int boardSize, int le
 		printWholeBoard(rowsInfo, longestRowLength, colsInfo, longestColLength, currentBoard, boardSize);
 		std::cout << "You have only " << level - wrongAnswers << " lives left!" << std::endl;
 
+		char saveGameMessage[] = "Do you want to save and exit the game?";
+		char toSaveGame = getYesOrNoInput(saveGameMessage);
+
+		if (toSaveGame == 'y')
+			return 's';
+
 		int x = 0;
 		int y = 0;
 		bool toFill = false;
@@ -856,9 +877,7 @@ char playNonogram(char** answerBoard, char** currentBoard, int boardSize, int le
 		if ((answerBoard[x][y] == '1' && toFill) || (answerBoard[x][y] == '0' && !toFill))
 		{
 			currentBoard[x][y] = (toFill ? '1' : '2');
-
 			autofillLineIfCurrentMoveFilledIt(x, y, currentBoard, answerBoard, boardSize);
-
 			if (doesUserWonTheGame(answerBoard, currentBoard, boardSize))
 			{
 				printWholeBoard(rowsInfo, longestRowLength, colsInfo, longestColLength, currentBoard, boardSize);
@@ -871,7 +890,7 @@ char playNonogram(char** answerBoard, char** currentBoard, int boardSize, int le
 			std::cout << "You made a mistake. This position should not be " << (toFill ? "checked" : "empty") << "." << std::endl;
 			if (++wrongAnswers == level)
 			{
-				std::cout << "you lost the game";
+				std::cout << "You have lost! ";
 				return 'l';
 			}
 		}
@@ -923,8 +942,6 @@ void deleteRows(const char* filename, int startRow, int endRow) {
 	}
 
 }
-
-
 
 void saveGame(int level, int boardForLevel, char* username, char** board, int boardSize)
 {
@@ -987,21 +1004,6 @@ void saveGame(int level, int boardForLevel, char* username, char** board, int bo
 	deleteMatrix(savedGames, savedGamesFileRows);
 }
 
-char getInputAfterGameEnded(char* message)
-{
-	char answer;
-	std::cout << message << " Yes='y' No='n': ";
-	std::cin >> answer;
-
-	while (answer != 'Y' && answer != 'N' && answer != 'y' && answer != 'n')
-	{
-		std::cout << "Invalid answer! Try again: ";
-		std::cin >> answer;
-	}
-
-	return answer;
-}
-
 bool handleAnswerAfterGameEnded(char answer, char**& currentBoard, int boardSize, int& level, int& boardForLevel, char* username, bool doesUserWon)
 {
 	if (answer == 'n' || answer == 'N')
@@ -1026,11 +1028,10 @@ bool handleAnswerAfterGameEnded(char answer, char**& currentBoard, int boardSize
 
 bool handleGameAnswer(char gameAnswer, char**& currentBoard, int boardSize, int& level, int& boardForLevel, char* username)
 {
-
 	if (gameAnswer == 'w')
 	{
 		char message[] = "Do you want to continue to the next level?";
-		char answer = getInputAfterGameEnded(message);
+		char answer = getYesOrNoInput(message);
 
 		if (!handleAnswerAfterGameEnded(answer, currentBoard, boardSize, level, boardForLevel, username, true))
 		{
@@ -1040,7 +1041,7 @@ bool handleGameAnswer(char gameAnswer, char**& currentBoard, int boardSize, int&
 	else if (gameAnswer == 'l')
 	{
 		char message[] = "Try again?";
-		char answer = getInputAfterGameEnded(message);
+		char answer = getYesOrNoInput(message);
 
 		if (!handleAnswerAfterGameEnded(answer, currentBoard, boardSize, level, boardForLevel, username, false))
 		{
@@ -1088,18 +1089,14 @@ char savedGameOrContinueOnPreviousLevelsHandler(int& level)
 
 int main()
 {
-
-	//setting up the game
 	char username[MaxAccountNameLength];
 	bool doesCurrentUserAlreadyHaveAnAccount = setup(username);
 
-	//see if the user have a saved game in the file with saved games
 	int level = 1;
 	int boardForLevel = generateRandomNumberBetweenOneAndTwo();
 	bool doesUserHaveASavedGame = false;
 	char** currentBoard = initBoard(level);
 	char** answerBoard;
-
 
 	if (doesCurrentUserAlreadyHaveAnAccount)
 	{
