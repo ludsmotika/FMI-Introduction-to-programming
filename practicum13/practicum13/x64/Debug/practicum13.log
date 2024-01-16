@@ -1,0 +1,4 @@
+﻿  practicum13.cpp
+C:\Users\danie\source\repos\FMI-Introduction-to-programming\practicum13\practicum13\practicum13.cpp(48,14): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\danie\source\repos\FMI-Introduction-to-programming\practicum13\practicum13\practicum13.cpp(96,11): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  practicum13.vcxproj -> C:\Users\danie\source\repos\FMI-Introduction-to-programming\practicum13\x64\Debug\practicum13.exe

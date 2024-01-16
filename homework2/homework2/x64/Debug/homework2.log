@@ -1,2 +1,6 @@
-﻿  2.cpp
+﻿  fn0MI0600397_d2_3.cpp
+  fn0MI0600397_d2_4.cpp
+C:\Users\danie\source\repos\FMI-Introduction-to-programming\homework2\homework2\fn0MI0600397_d2_4.cpp(119,74): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\danie\source\repos\FMI-Introduction-to-programming\homework2\homework2\fn0MI0600397_d2_4.cpp(119,71): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+  Generating Code...
   homework2.vcxproj -> C:\Users\danie\source\repos\FMI-Introduction-to-programming\homework2\x64\Debug\homework2.exe

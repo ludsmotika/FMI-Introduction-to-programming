@@ -127,10 +127,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="2.cpp" />
-    <ClCompile Include="3.cpp" />
-    <ClCompile Include="4.cpp" />
-    <ClCompile Include="homework2.cpp" />
+    <ClCompile Include="fn0MI0600397_d2_2.cpp" />
+    <ClCompile Include="fn0MI0600397_d2_3.cpp" />
+    <ClCompile Include="fn0MI0600397_d2_4.cpp" />
+    <ClCompile Include="fn0MI0600397_d2_1.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

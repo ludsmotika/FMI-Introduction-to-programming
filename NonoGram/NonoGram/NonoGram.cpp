@@ -162,16 +162,12 @@ int boardSizeForLevel(int level)
 		return 5;
 		break;
 	case 2:
+	case 3:
 		return 10;
 		break;
-	case 3:
-		return 15;
-		break;
 	case 4:
-		return 20;
-		break;
 	case 5:
-		return 25;
+		return 15;
 		break;
 
 	default:
@@ -385,18 +381,18 @@ char** checkForSavedGameOfUser(char* username, int& level, int& boardForLevel, b
 
 	for (size_t i = 0; i < savedGamesFileRows; i++)
 	{
-		if (mystrcmp(savedGames[i], "save") && mystrcmp(savedGames[i + 1], username))
+		if (!mystrcmp(savedGames[i], "save") && savedGames[i + 1] && !mystrcmp(savedGames[i + 1], username))
 		{
-			level = convertStrToUnsigned(savedGames[i + 1]);
-			boardForLevel = convertStrToUnsigned(savedGames[i + 2]);
+			level = convertStrToUnsigned(savedGames[i + 2]);
+			boardForLevel = convertStrToUnsigned(savedGames[i + 3]);
 			int boardSize = boardSizeForLevel(level);
 
 			char** board = new char* [boardSize];
 
 			for (size_t j = 0; j < boardSize; j++)
 			{
-				board[j] = new char[boardSize+1];
-				mystrcpy(savedGames[j + i + 3], board[j]);
+				board[j] = new char[boardSize + 1];
+				mystrcpy(savedGames[j + i + 4], board[j]);
 			}
 
 			deleteMatrix(savedGames, savedGamesFileRows);
@@ -891,7 +887,7 @@ void deleteRows(const char* filename, int startRow, int endRow) {
 		return;
 	}
 
-	if (startRow <= 0 || endRow < startRow) {
+	if (startRow < 0 || endRow < startRow) {
 		std::cout << "Invalid startRow or endRow values." << std::endl;
 		inputFile.close();
 		return;
@@ -899,7 +895,7 @@ void deleteRows(const char* filename, int startRow, int endRow) {
 
 	std::ofstream outputFile("temp.txt");
 
-	int currentRow = 1;
+	int currentRow = 0;
 	char line[MaxRowInFileLength];
 
 	while (inputFile.getline(line, sizeof(line)))
@@ -953,7 +949,7 @@ void saveGame(int level, int boardForLevel, char* username, char** board, int bo
 
 	for (size_t i = 0; i < savedGamesFileRows; i++)
 	{
-		if (mystrcmp(savedGames[i], "save") && mystrcmp(savedGames[i + 1], username))
+		if (!mystrcmp(savedGames[i], "save") && !mystrcmp(savedGames[i + 1], username))
 		{
 			rowToStartDeleting = i;
 			int levelForSavedGameToDelete = convertStrToUnsigned(savedGames[i + 2]);
@@ -1056,8 +1052,38 @@ bool handleGameAnswer(char gameAnswer, char**& currentBoard, int boardSize, int&
 		saveGame(level, boardForLevel, username, currentBoard, boardSize);
 		return false;
 	}
+	else if (gameAnswer == 'e')
+	{
+		return false;
+	}
 
 	return true;
+}
+
+bool continueGameAnswerIsValid(char answer, int level)
+{
+	if (answer != 'c' && convertCharToDigit(answer) > level)
+	{
+		return false;
+	}
+	return true;
+}
+
+char savedGameOrContinueOnPreviousLevelsHandler(int& level)
+{
+	std::cout << "You have a saved game! You can continue the game or start on level which you have already played on." << std::endl;
+	std::cout << "Your saved game is on level " << level << ". Choose 'c' for continue or enter the number of the level which you want to start play on. And remember you can play on levels before the one you reached:";
+
+	char answer;
+	std::cin >> answer;
+
+	while (!continueGameAnswerIsValid(answer, level))
+	{
+		char answer;
+		std::cin >> answer;
+	}
+
+	return answer;
 }
 
 int main()
@@ -1081,10 +1107,18 @@ int main()
 
 		if (!currentBoard)
 		{
-		//get the input from the user if he want to continue playing one of the levels he had played
-
+			currentBoard = initBoard(level);
 		}
+		else
+		{
+			char answer = savedGameOrContinueOnPreviousLevelsHandler(level);
 
+			if (answer != 'c')
+			{
+				level = convertCharToDigit(answer);
+				currentBoard = initBoard(level);
+			}
+		}
 	}
 
 	while (true)
@@ -1092,27 +1126,27 @@ int main()
 		answerBoard = loadLevel(level, boardForLevel);
 		int boardSize = boardSizeForLevel(level);
 
-		printCharMatrix(answerBoard, boardSize);
-		printCharMatrix(currentBoard, boardSize);
+		//printCharMatrix(answerBoard, boardSize);
+		//printCharMatrix(currentBoard, boardSize);
+
 		char gameAnswer = playNonogram(answerBoard, currentBoard, boardSize, level);
 		// w == won, l == lose, s == saveGame and exit
 
 		if (!handleGameAnswer(gameAnswer, currentBoard, boardSize, level, boardForLevel, username))
-		{
 			return 0;
-		}
 
 		if (level == 6)
 		{
 			std::cout << "You passed all the levels. Congratulations!!!";
 			return 0;
 		}
-
 	}
 }
 
 //todo: check for memory leaks
 //todo: check for null ptr if's in the methods
 //todo: check where does the methods should receive const pointer
+//current board memory leak when checking for saved game
+//handleAnswerAfterGameEnded current board initBoard pointer reallocation
 
 
