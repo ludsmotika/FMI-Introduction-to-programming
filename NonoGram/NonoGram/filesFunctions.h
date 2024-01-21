@@ -1,3 +1,18 @@
+/**
+*
+* Solution to course project # 9
+* Introduction to programming course
+* Faculty of Mathematics and Informatics of Sofia University
+* Winter semester 2023/2024
+*
+* @author Daniel Stefanov
+* @idnumber 0MI0600397
+* @compiler VC
+*
+* file with functions which i use for working with files
+*
+*/
+
 #pragma once
 #include <fstream>
 #include "basicFunctions.h";
