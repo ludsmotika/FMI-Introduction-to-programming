@@ -129,6 +129,13 @@
   <ItemGroup>
     <ClCompile Include="NonoGram.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="basicFunctions.h" />
+    <ClInclude Include="filesFunctions.h" />
+    <ClInclude Include="mainGameFunctions.h" />
+    <ClInclude Include="printingFunctions.h" />
+    <ClInclude Include="userInputFunctions.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
